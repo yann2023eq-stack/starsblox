@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starsblox — Moderation Interest Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #070711;
+  --panel: rgba(255,255,255,0.03);
+  --rim: rgba(255,255,255,0.07);
+  --violet: #9b7fea;
+  --violet-dim: #6a52b0;
+  --violet-pale: #c4b0ff;
+  --rose: #e07fa0;
+  --amber: #e8a44a;
+  --amber-dim: rgba(232,164,74,0.10);
+  --amber-border: rgba(232,164,74,0.25);
+  --text: #ddd8f0;
+  --muted: #7a748f;
+  --faint: #3a3550;
+  --success: #6fcfa0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+#bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+.wrap { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; padding: 80px 28px 100px; }
+
+/* HEADER */
+.brand { text-align: center; margin-bottom: 40px; animation: riseIn 0.7s cubic-bezier(.16,1,.3,1) both; }
+.brand-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+  color: var(--violet); margin-bottom: 24px; opacity: 0.85;
+}
+.brand-eyebrow::before, .brand-eyebrow::after { content: ''; display: block; width: 28px; height: 1px; background: var(--violet-dim); }
+.brand h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 6vw, 58px); font-weight: 300; letter-spacing: -0.5px;
+  line-height: 1.1; color: #fff; margin-bottom: 6px;
+}
+.brand h1 em { font-style: italic; color: var(--violet-pale); }
+.brand-sub { font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.8; max-width: 480px; margin: 18px auto 0; }
+
+/* MR+ ALERT */
+.mr-alert {
+  display: flex; gap: 16px; align-items: flex-start;
+  background: var(--amber-dim); border: 1px solid var(--amber-border);
+  border-radius: 14px; padding: 22px 26px; margin-bottom: 20px;
+  animation: riseIn 0.6s cubic-bezier(.16,1,.3,1) both;
+  animation-delay: 0.04s; position: relative; overflow: hidden;
+}
+.mr-alert::before {
+  content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--amber), transparent); opacity: 0.5;
+}
+.mr-alert-icon { font-size: 22px; flex-shrink: 0; line-height: 1; padding-top: 2px; }
+.mr-alert-title { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 600; letter-spacing: 0.5px; color: var(--amber); margin-bottom: 7px; }
+.mr-alert-body { font-size: 12.5px; color: #b89060; line-height: 1.75; }
+.mr-alert-body strong { color: var(--amber); font-weight: 600; }
+
+/* ORNAMENT */
+.ornament {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  color: var(--faint); font-size: 11px; letter-spacing: 3px; margin: 36px 0;
+}
+.ornament::before { content: ''; flex: 1; max-width: 120px; height: 1px; background: linear-gradient(to right, transparent, var(--faint)); }
+.ornament::after  { content: ''; flex: 1; max-width: 120px; height: 1px; background: linear-gradient(to left,  transparent, var(--faint)); }
+
+/* CARD */
+.card {
+  background: var(--panel); border: 1px solid var(--rim); border-radius: 16px;
+  padding: 36px 40px; margin-bottom: 16px; position: relative; overflow: hidden;
+  animation: riseIn 0.6s cubic-bezier(.16,1,.3,1) both;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--violet-dim), transparent); opacity: 0.6;
+}
+@media (max-width: 540px) { .card { padding: 24px 20px; } }
+
+/* SECTION LABEL */
+.slabel {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--violet); margin-bottom: 22px;
+  display: flex; align-items: center; gap: 12px;
+}
+.slabel::after { content: ''; flex: 1; height: 1px; background: var(--rim); }
+
+/* REQUIREMENTS */
+.req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+@media (max-width: 560px) { .req-grid { grid-template-columns: 1fr; } }
+.req-item { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.req-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--violet-dim); flex-shrink: 0; margin-top: 6px; }
+
+/* FORM */
+.fgrid { display: grid; gap: 22px; }
+.frow  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 520px) { .frow { grid-template-columns: 1fr; } }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.flabel { font-size: 10.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--violet-dim); font-weight: 500; }
+.flabel .ast { color: var(--rose); margin-left: 2px; }
+
+input[type=text], input[type=number], select, textarea {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--rim);
+  border-radius: 10px; padding: 13px 16px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
+  outline: none; width: 100%;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--violet-dim);
+  background: rgba(155,127,234,0.06);
+  box-shadow: 0 0 0 3px rgba(155,127,234,0.1);
+}
+input::placeholder, textarea::placeholder { color: var(--faint); }
+select option { background: #14121f; color: var(--text); }
+select optgroup { background: #0e0c1a; color: var(--violet-dim); font-size: 10px; letter-spacing: 1px; }
+textarea { resize: vertical; min-height: 108px; line-height: 1.65; }
+
+.select-wrap { position: relative; }
+.select-wrap::after {
+  content: ''; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 0; height: 0;
+  border-left: 4px solid transparent; border-right: 4px solid transparent;
+  border-top: 5px solid var(--violet-dim); pointer-events: none;
+}
+#otherRankWrap { display: none; margin-top: 10px; }
+
+.rank-hint {
+  font-size: 10.5px; color: var(--amber);
+  background: rgba(232,164,74,0.07); border: 1px solid rgba(232,164,74,0.18);
+  border-radius: 7px; padding: 8px 12px; margin-top: 4px; line-height: 1.6;
+}
+
+.char-count { font-size: 10px; color: var(--faint); text-align: right; margin-top: 3px; transition: color 0.2s; }
+.char-count.warn { color: var(--rose); }
+
+/* NOTICE */
+.notice {
+  background: rgba(155,127,234,0.05); border: 1px solid rgba(155,127,234,0.12);
+  border-radius: 10px; padding: 18px 22px; font-size: 12.5px; color: var(--muted); line-height: 1.8;
+}
+.notice strong { color: var(--violet-pale); }
+.notice ul { list-style: none; margin-top: 10px; display: grid; gap: 6px; }
+.notice ul li { display: flex; gap: 8px; }
+.notice ul li::before { content: '›'; color: var(--violet-dim); font-weight: 700; }
+
+.warn-notice {
+  background: rgba(224,127,160,0.05); border: 1px solid rgba(224,127,160,0.15);
+  border-radius: 10px; padding: 14px 20px; font-size: 12px; color: var(--muted); line-height: 1.7;
+}
+.warn-notice strong { color: var(--rose); }
+
+/* CHECKBOX */
+.check-row { display: flex; align-items: flex-start; gap: 13px; cursor: pointer; }
+.check-row input[type=checkbox] { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; accent-color: var(--violet); cursor: pointer; }
+.check-text { font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+
+/* SUBMIT */
+.submit-area { text-align: center; padding-top: 8px; }
+.btn-submit {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 600;
+  letter-spacing: 2.5px; text-transform: uppercase; color: #fff;
+  background: linear-gradient(135deg, var(--violet-dim) 0%, var(--violet) 50%, var(--violet-dim) 100%);
+  background-size: 200% 100%; border: none; border-radius: 10px;
+  padding: 16px 56px; cursor: pointer;
+  transition: background-position .45s, transform .2s, box-shadow .3s, opacity .2s;
+  box-shadow: 0 4px 28px rgba(155,127,234,0.25); position: relative; overflow: hidden;
+}
+.btn-submit::after { content: ''; position: absolute; inset: 0; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); }
+.btn-submit:hover { background-position: 100% 0; transform: translateY(-2px); box-shadow: 0 10px 40px rgba(155,127,234,0.4); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.status { display: none; margin-top: 16px; border-radius: 8px; padding: 12px 18px; font-size: 13px; text-align: center; }
+.status.sending { display: block; color: var(--violet-pale); background: rgba(155,127,234,0.08); border: 1px solid rgba(155,127,234,0.2); }
+.status.error   { display: block; color: var(--rose); background: rgba(224,127,160,0.07); border: 1px solid rgba(224,127,160,0.2); }
+
+/* SUCCESS */
+.success-screen { display: none; text-align: center; padding: 60px 20px; animation: riseIn .7s cubic-bezier(.16,1,.3,1) both; }
+.success-icon { width: 64px; height: 64px; margin: 0 auto 24px; border-radius: 50%; background: rgba(111,207,160,0.12); border: 1px solid rgba(111,207,160,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.success-screen h2 { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 300; color: #fff; margin-bottom: 14px; }
+.success-screen p { font-size: 13.5px; color: var(--muted); line-height: 1.85; max-width: 400px; margin: 0 auto; }
+.success-screen small { display: block; margin-top: 20px; font-size: 11px; color: var(--faint); letter-spacing: 0.5px; }
+
+.foot { text-align: center; font-size: 11px; color: var(--faint); margin-top: 48px; letter-spacing: 1px; }
+
+@keyframes riseIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="brand">
+    <div class="brand-eyebrow">✦ Starsblox Shopping ✦</div>
+    <h1>Moderation<br><em>Interest Form</em></h1>
+    <p class="brand-sub">Our moderation team is professionally structured with a high-quality working environment. We look for individuals who demonstrate responsibility and professionalism. Fill out this form carefully — it will help us assess your suitability.</p>
+  </div>
+
+  <!-- MR+ ALERT -->
+  <div class="mr-alert">
+    <div class="mr-alert-icon">⚠️</div>
+    <div>
+      <div class="mr-alert-title">MR+ Rank Required — Management Rank &amp; Above Only</div>
+      <div class="mr-alert-body">This interest form is <strong>exclusively for members who hold a Management Rank (MR) or above</strong> within Starsblox Shopping. If you do not currently hold an MR+ rank, please do not submit this form. Submissions from non-qualifying members will be automatically disregarded.</div>
+    </div>
+  </div>
+
+  <!-- REQUIREMENTS -->
+  <div class="card" style="animation-delay:0.08s">
+    <div class="slabel">Requirements</div>
+    <div class="req-grid">
+      <div class="req-item"><div class="req-dot"></div><span>Must be 14 years of age or older.</span></div>
+      <div class="req-item"><div class="req-dot"></div><span>Must hold a Management Rank (MR+) in StarsBlox.</span></div>
+      <div class="req-item"><div class="req-dot"></div><span>Prior moderation experience is an advantage.</span></div>
+      <div class="req-item"><div class="req-dot"></div><span>Must not have any serious moderation actions on record.</span></div>
+      <div class="req-item"><div class="req-dot"></div><span>Discord account must be at least 30 days old.</span></div>
+      <div class="req-item"><div class="req-dot"></div><span>Must be able to communicate in English.</span></div>
+      <div class="req-item"><div class="req-dot"></div><span>Must handle situations calmly and professionally.</span></div>
+      <div class="req-item"><div class="req-dot"></div><span>Proper grammar expected where required.</span></div>
+      <div class="req-item"><div class="req-dot"></div><span>Do not ask others for answers — results in auto denial.</span></div>
+      <div class="req-item"><div class="req-dot"></div><span>AI use during the application will void your submission.</span></div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="card" style="animation-delay:0.14s">
+    <div class="slabel">Your Application</div>
+
+    <form class="fgrid" id="appForm">
+
+      <div class="frow">
+        <div class="field">
+          <label class="flabel">Discord Username <span class="ast">*</span></label>
+          <input id="f_discord" type="text" placeholder="e.g. username or user#0000" required maxlength="80">
+        </div>
+        <div class="field">
+          <label class="flabel">Roblox Username <span class="ast">*</span></label>
+          <input id="f_roblox" type="text" placeholder="YourRobloxName" required maxlength="80">
+        </div>
+      </div>
+
+      <div class="frow">
+        <div class="field">
+          <label class="flabel">Age <span class="ast">*</span></label>
+          <input id="f_age" type="number" min="14" max="99" placeholder="e.g. 17" required>
+        </div>
+        <div class="field">
+          <label class="flabel">Timezone <span class="ast">*</span></label>
+          <input id="f_timezone" type="text" placeholder="e.g. EST, UTC+2, GMT" required maxlength="40">
+        </div>
+      </div>
+
+      <!-- RANK — exact roles from screenshots, ordered highest to lowest -->
+      <div class="field">
+        <label class="flabel">Your Current StarsBlox Rank <span class="ast">*</span></label>
+        <div class="select-wrap">
+          <select id="f_rank" required onchange="toggleOtherRank(this)">
+            <option value="" disabled selected>— Select your rank —</option>
+
+            <optgroup label="── Corporate ──">
+              <option value="【SC】Senior Corporate">【SC】Senior Corporate</option>
+              <option value="【JC】Junior Corporate">【JC】Junior Corporate</option>
+            </optgroup>
+
+            <optgroup label="── Senior Departments ──">
+              <option value="Senior Human Resources">Senior Human Resources</option>
+              <option value="Senior Public Relations">Senior Public Relations</option>
+            </optgroup>
+
+            <optgroup label="── Departments ──">
+              <option value="Human Resources Manager">Human Resources Manager</option>
+              <option value="Public Relations Manager">Public Relations Manager</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Public Relations">Public Relations</option>
+            </optgroup>
+
+            <optgroup label="── Management ──">
+              <option value="Management">Management</option>
+              <option value="【GM】General Manager">【GM】General Manager</option>
+              <option value="【M】Manager">【M】Manager</option>
+              <option value="【AM】Assistant Manager">【AM】Assistant Manager</option>
+              <option value="【IM】Intern Manager">【IM】Intern Manager</option>
+            </optgroup>
+
+            <optgroup label="── Supervisors ──">
+              <option value="Supervisors">Supervisors</option>
+              <option value="【LSV】Lead Supervisor">【LSV】Lead Supervisor</option>
+              <option value="【SSV】Senior Supervisor">【SSV】Senior Supervisor</option>
+              <option value="【JSV】Junior Supervisor">【JSV】Junior Supervisor</option>
+              <option value="【IS】Intern Supervisor">【IS】Intern Supervisor</option>
+            </optgroup>
+
+            <optgroup label="── Other ──">
+              <option value="other">My rank isn't listed — I'll type it</option>
+            </optgroup>
+          </select>
+        </div>
+        <div id="otherRankWrap">
+          <input id="f_rank_other" type="text" placeholder="Type your exact rank here…" maxlength="80">
+        </div>
+        <div class="rank-hint">⚠️ Only Management Rank (MR+) and above are eligible for this form.</div>
+      </div>
+
+      <!-- Availability -->
+      <div class="field">
+        <label class="flabel">Hours available per week <span class="ast">*</span></label>
+        <div class="select-wrap">
+          <select id="f_hours" required>
+            <option value="" disabled selected>— Select availability —</option>
+            <option>1 – 5 hours</option>
+            <option>5 – 10 hours</option>
+            <option>10 – 20 hours</option>
+            <option>20+ hours</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="field">
+        <label class="flabel">Why do you want to join the Moderation team? <span class="ast">*</span></label>
+        <textarea id="f_motivation" placeholder="Tell us what motivates you to apply and why you'd be a good fit…" required maxlength="1000" oninput="count(this,'mc1',1000)"></textarea>
+        <div class="char-count" id="mc1">0 / 1000</div>
+      </div>
+
+      <div class="field">
+        <label class="flabel">Prior moderation or community experience</label>
+        <textarea id="f_experience" placeholder="Describe any servers moderated, roles held, tools used, etc. Leave blank if none." maxlength="800" oninput="count(this,'mc2',800)"></textarea>
+        <div class="char-count" id="mc2">0 / 800</div>
+      </div>
+
+      <div class="field">
+        <label class="flabel">How would you handle a rule-breaking member? <span class="ast">*</span></label>
+        <textarea id="f_scenario" placeholder="Walk us through your approach step by step…" required maxlength="800" oninput="count(this,'mc3',800)"></textarea>
+        <div class="char-count" id="mc3">0 / 800</div>
+      </div>
+
+      <div class="field">
+        <label class="flabel">Anything else you'd like us to know?</label>
+        <textarea id="f_extra" placeholder="Languages spoken, strengths, additional context…" maxlength="600" oninput="count(this,'mc4',600)"></textarea>
+        <div class="char-count" id="mc4">0 / 600</div>
+      </div>
+
+      <div class="notice">
+        <strong>Data &amp; Privacy Notice</strong>
+        <ul>
+          <li>Your information will be securely stored for internal review purposes only.</li>
+          <li>You may request data deletion at any time by contacting Moderation Leadership.</li>
+        </ul>
+      </div>
+
+      <div class="warn-notice">
+        Any form of rule violation or failure to comply with Discord's Terms &amp; Conditions may result in your application being <strong>rejected</strong>.
+      </div>
+
+      <label class="check-row">
+        <input type="checkbox" id="f_agree" required>
+        <span class="check-text">I confirm that I hold an <strong>MR+ rank</strong>, I meet all listed requirements, I have <strong>not</strong> used AI to complete this form, and I agree to the Data &amp; Privacy Notice above.</span>
+      </label>
+
+      <div class="submit-area">
+        <button type="submit" class="btn-submit" id="submitBtn">Submit Interest</button>
+        <div class="status" id="statusBanner"></div>
+      </div>
+
+    </form>
+
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✦</div>
+      <h2>Application Received</h2>
+      <p>Thank you for expressing your interest in the Starsblox Moderation Department. Our team will carefully review your submission and get in touch if you move forward.</p>
+      <small>Please do not contact staff about your application status.</small>
+    </div>
+  </div>
+
+  <div class="ornament">✦</div>
+  <p class="foot">Starsblox Shopping · Moderation Department · ────୨ৎ────</p>
+</div>
+
+<script>
+const WEBHOOK  = 'https://discord.com/api/webhooks/1479538689142161508/veBgY5HatGqKi0xjbgS9Cc3xYxPJASaMXSskClFRCYhTVDWw0SJm3uZRQEafFi26WadY';
+const PING_IDS = ['1446400228998643742', '1445560335888285736'];
+
+// Starfield
+(function(){
+  const cvs = document.getElementById('bg-canvas');
+  const ctx = cvs.getContext('2d');
+  let W, H, stars = [];
+  function resize(){ W = cvs.width = window.innerWidth; H = cvs.height = window.innerHeight; }
+  function initStars(){
+    stars = Array.from({length:180}, () => ({
+      x: Math.random()*W, y: Math.random()*H,
+      r: Math.random()*1.4+0.2,
+      a: Math.random(), da: (Math.random()-.5)*0.006,
+      hue: Math.random()>.7 ? 260 : 0
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const g = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)/1.5);
+    g.addColorStop(0,'#0f0c1e'); g.addColorStop(1,'#070711');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+    stars.forEach(s => {
+      s.a += s.da;
+      if(s.a>1||s.a<0.05) s.da*=-1;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle = s.hue ? `hsla(${s.hue},60%,80%,${s.a})` : `rgba(255,255,255,${s.a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{ resize(); initStars(); });
+  resize(); initStars(); draw();
+})();
+
+function toggleOtherRank(sel){
+  const wrap  = document.getElementById('otherRankWrap');
+  const input = document.getElementById('f_rank_other');
+  const show  = sel.value === 'other';
+  wrap.style.display = show ? 'block' : 'none';
+  input.required = show;
+  if(show) input.focus();
+}
+
+function count(el, id, max){
+  const n = el.value.length;
+  const c = document.getElementById(id);
+  c.textContent = `${n} / ${max}`;
+  c.classList.toggle('warn', n > max * 0.9);
+}
+
+function val(id){ return (document.getElementById(id)?.value || '').trim(); }
+function trunc(s, n=1000){ return s.length > n ? s.slice(0,n-1)+'…' : (s || 'Not provided'); }
+
+document.getElementById('appForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn    = document.getElementById('submitBtn');
+  const banner = document.getElementById('statusBanner');
+
+  const discord    = val('f_discord');
+  const roblox     = val('f_roblox');
+  const age        = val('f_age');
+  const rankSel    = document.getElementById('f_rank');
+  const rankOther  = val('f_rank_other');
+  const rank       = rankSel.value === 'other' ? (rankOther || 'Other') : rankSel.value;
+  const timezone   = val('f_timezone');
+  const hours      = val('f_hours');
+  const motivation = val('f_motivation');
+  const experience = val('f_experience');
+  const scenario   = val('f_scenario');
+  const extra      = val('f_extra');
+  const timestamp  = new Date().toUTCString();
+
+  const pings = PING_IDS.map(id => `<@${id}>`).join(' ');
+
+  const payload = {
+    content: `${pings}\n> 📋 **New Moderation Interest Application submitted!**`,
+    embeds: [{
+      color: 0x9b7fea,
+      author: { name: 'Starsblox Shopping — Moderation Interest Form' },
+      title: `✦  Application from ${discord}`,
+      fields: [
+        { name: '👤  Discord Username',         value: trunc(discord,200),  inline: true  },
+        { name: '🎮  Roblox Username',           value: trunc(roblox,200),   inline: true  },
+        { name: '🎂  Age',                       value: age || '—',          inline: true  },
+        { name: '🏷️  StarsBlox Rank',           value: trunc(rank,200),     inline: true  },
+        { name: '🌍  Timezone',                  value: trunc(timezone,100), inline: true  },
+        { name: '⏱️  Hours / Week',             value: trunc(hours,100),    inline: true  },
+        { name: '💬  Why do you want to join?', value: trunc(motivation),   inline: false },
+        { name: '🛡️  Prior Experience',         value: trunc(experience),   inline: false },
+        { name: '⚠️  Rule-Breaking Scenario',   value: trunc(scenario),     inline: false },
+        { name: '📝  Additional Notes',          value: trunc(extra),        inline: false },
+      ],
+      footer: { text: `Starsblox Moderation · MR+ Interest Form · ${timestamp}` }
+    }]
+  };
+
+  btn.disabled = true;
+  banner.className   = 'status sending';
+  banner.textContent = '⏳ Submitting your application…';
+
+  try {
+    const res = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if(res.ok || res.status === 204){
+      document.getElementById('appForm').style.display       = 'none';
+      banner.style.display                                    = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+    } else {
+      throw new Error(`HTTP ${res.status}`);
+    }
+  } catch(err){
+    banner.className   = 'status error';
+    banner.textContent = '❌ Submission failed. Please try again or contact staff directly.';
+    btn.disabled = false;
+    console.error(err);
+  }
+});
+</script>
+</body>
+</html>
